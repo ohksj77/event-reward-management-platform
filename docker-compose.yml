@@ -1,0 +1,41 @@
+services:
+  api-gateway-server:
+    build: ./api-gateway-server
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/gatewaydb
+      AUTH_URL: http://auth-server:3001
+      EVENT_URL: http://event-server:3002
+
+  auth-server:
+    build: ./auth-server
+    ports:
+      - '3001:3001'
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/authdb
+      JWT_SECRET: ${JWT_SECRET}
+
+  event-server:
+    build: ./event-server
+    ports:
+      - '3002:3002'
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/eventdb
+
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    tty: true
+
+volumes:
+  mongo-data: null
