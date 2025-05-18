@@ -1,45 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
+import { LoggerService } from './logger/logger.service';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
+    private readonly logger: LoggerService,
   ) {}
 
-  async forwardRequest(path: string, method: string, body?: any, headers?: any) {
-    const authUrl = this.configService.get<string>('AUTH_URL');
-    const eventUrl = this.configService.get<string>('EVENT_URL');
+  async forwardRequest(url: string, method: string, body?: any, headers?: any) {
+    const { host, 'content-length': _contentLength, ...safeHeaders } = headers || {};
 
-    // 인증 관련 요청은 auth 서버로 전달
-    if (path.startsWith('/auth')) {
-      const response = await firstValueFrom(
-        this.httpService.request({
-          url: `${authUrl}${path}`,
-          method,
-          data: body,
-          headers,
-        }),
-      );
+    try {
+      const config: any = {
+        url,
+        method,
+        headers: {...safeHeaders},
+        timeout: 10000,
+      };
+      if (['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
+        config.data = body ?? {};
+        config.headers['content-type'] = 'application/json';
+      }
+      
+      this.logger.logRequest(config);
+      const response = await firstValueFrom(this.httpService.request(config));
+      this.logger.logResponse(response);
+      
       return response.data;
+    } catch (error) {
+      this.logger.logError(error);
+      
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Request timeout');
+      }
+      
+      throw error;
     }
-
-    // 이벤트 관련 요청은 event 서버로 전달
-    if (path.startsWith('/events')) {
-      const response = await firstValueFrom(
-        this.httpService.request({
-          url: `${eventUrl}${path}`,
-          method,
-          data: body,
-          headers,
-        }),
-      );
-      return response.data;
-    }
-
-    throw new Error('Invalid path');
   }
 }
