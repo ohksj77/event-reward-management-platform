@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TokenService } from './token.service';
 import { JwtService } from '@nestjs/jwt';
 import { TokenRepository } from './token.repository';
-import { UserDocument } from '../user/user.schema';
+import { User } from '../user/user.schema';
 import { AUTH_CONSTANTS } from '../auth/auth.constants';
 
 describe('TokenService', () => {
@@ -21,7 +21,7 @@ describe('TokenService', () => {
     updateOne: jest.fn(),
   };
 
-  const mockUser: Partial<UserDocument> = {
+  const mockUser: Partial<User> = {
     _id: 'user123',
     loginId: 'testuser',
   };
@@ -60,7 +60,7 @@ describe('TokenService', () => {
         .mockReturnValueOnce(accessToken)
         .mockReturnValueOnce(refreshToken);
 
-      const result = service.generateTokens(mockUser as UserDocument);
+      const result = service.generateTokens(mockUser as User);
 
       expect(result).toEqual({
         accessToken,

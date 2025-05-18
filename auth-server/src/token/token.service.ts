@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserDocument } from '../user/user.schema';
+import { User } from '../user/user.schema';
 import { TokenRepository } from './token.repository';
 import { AUTH_CONSTANTS } from '../auth/auth.constants';
 import { JwtPayload } from './types';
@@ -12,7 +12,7 @@ export class TokenService {
     private readonly tokenRepository: TokenRepository,
   ) {}
 
-  generateTokens(user: UserDocument) {
+  generateTokens(user: User) {
     const payload: JwtPayload = { 
       sub: user._id.toString(),
       username: user.loginId,
