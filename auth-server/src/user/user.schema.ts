@@ -22,11 +22,16 @@ export class User extends Document {
     @Prop({ required: true, enum: UserRole, default: UserRole.USER })
     role: UserRole;
 
+    @Prop({ type: [String], default: [] })
+    permissions: string[];
+
     @Prop({ default: null })
     deletedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ loginId: 1 }, { unique: true });
 
 UserSchema.pre('find', function() {
   this.where({ deletedAt: null });

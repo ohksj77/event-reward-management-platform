@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
-import { UserDocument } from './user.schema';
+import { Document } from 'mongoose';
+import { User } from './user.schema';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { UserRepository } from './user.repository';
 
@@ -10,7 +11,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async create(registerDto: RegisterDto): Promise<UserDocument> {
+  async create(registerDto: RegisterDto): Promise<User & Document> {
     const hash = await bcrypt.hash(registerDto.password, 10);
     return this.userRepository.create({
       ...registerDto,
@@ -18,11 +19,11 @@ export class UserService {
     });
   }
 
-  async findByLoginId(loginId: string): Promise<UserDocument | null> {
+  async findByLoginId(loginId: string): Promise<(User & Document) | null> {
     return this.userRepository.findOne({ loginId });
   }
 
-  async findById(id: string): Promise<UserDocument | null> {
+  async findById(id: string): Promise<(User & Document) | null> {
     return this.userRepository.findById(id);
   }
 

@@ -20,6 +20,9 @@ export class RefreshToken extends Document {
 
 export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
 
+RefreshTokenSchema.index({ value: 1 }, { expireAfterSeconds: 0 });
+RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
 RefreshTokenSchema.pre('find', function() {
   this.where({ deletedAt: null });
 });

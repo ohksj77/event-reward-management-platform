@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { RefreshTokenDto } from './dto/auth.dto';
-import { UserDocument } from '../user/user.schema';
+import { User } from '../user/user.schema';
 import { AUTH_CONSTANTS } from './auth.constants';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -14,7 +14,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<UserDocument> {
+  async register(registerDto: RegisterDto): Promise<User> {
     const existingUser = await this.userService.findByLoginId(registerDto.loginId);
     if (existingUser) {
       throw new ConflictException(AUTH_CONSTANTS.ERROR_MESSAGES.DUPLICATE_LOGIN_ID);

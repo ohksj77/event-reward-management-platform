@@ -1,8 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from '../decorators/roles.decorator';
 import { ENDPOINT_PERMISSIONS } from '../constants/endpoints.constants';
-import { ROLE_HIERARCHY } from '../constants/roles.constants';
 
 const ERROR_MESSAGES = {
   NO_PERMISSION: '접근 권한이 없습니다.',
@@ -33,15 +31,6 @@ export class RolesGuard implements CanActivate {
     }
 
     const userRole = request.user.role;
-    
-    const hasPermission = requiredRoles.some(role => {
-      return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[role];
-    });
-
-    if (!hasPermission) {
-      throw new ForbiddenException(ERROR_MESSAGES.NO_PERMISSION);
-    }
-
-    return true;
+    return requiredRoles.includes(userRole);
   }
 }
