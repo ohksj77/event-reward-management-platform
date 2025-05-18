@@ -35,6 +35,13 @@
 - 공통 사항
     - api 서버임을 구분 가능하면서 api 버저닝이 가능하도록 prefix “/api/v1/” 을 사용
 
+### 인증
+
+- 회원가입: [POST] /api/v1/auth/register
+- 로그인: [POST] /api/v1/auth/login
+- 토큰 리프레시: [POST] /api/v1/auth/refresh
+- 로그아웃: [POST] /api/v1/auth/logout
+
 ### 이벤트
 
 - 이벤트 등록: [POST] /api/v1/events
