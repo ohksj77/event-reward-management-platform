@@ -47,22 +47,23 @@
 - 이벤트 등록: [POST] /api/v1/events
 - 이벤트 목록 조회: [GET] /api/v1/events?page=0&size=20
 - 이벤트 상세 조회: [GET] /api/v1/events/{event-id}
+    - 보상 정보도 함께 조회
 
 ### 보상
 
 - 보상 등록: [POST] /api/v1/rewards
 - 보상 조회: [GET] /api/v1/rewards/{reward-id}
-- 이벤트를 통한 조회 보상 조회: [GET] /api/v1/rewards/events/{event-id}
 
 ### 보상 요청
 
 - 보상 요청: [POST] /api/v1/reward-requests
+    - 즉시 응답 이후 비동기적으로 로직 수행
 
 ### 보상 요청 내역 확인
 
 - 유저 본인 보상 요청 이력 확인: [GET] /api/v1/reward-requests/{reward-request-id}
     - 실제 요청 결과를 확인할 때는 이 API를 폴링으로 PENDING에서 성공/실패로 바뀔때까지 반복 요청 (최대 반복 횟수 혹은 전체 timeout 설정 필요)
-- (운영자 / 감사자 / 관리자) 전체 유저 요청 기록 조회: [GET] /api/v1/reward-requests?page=0&size=20
+- [운영자 / 감사자 / 관리자] 전체 유저 요청 기록 조회: [GET] /api/v1/reward-requests?page=0&size=20
 - 필터링 조회: [GET] /api/v1/reward-requests?type=STATUS&target=PENDING
 
 
