@@ -1,41 +1,59 @@
 services:
   api-gateway-server:
     build: ./api-gateway-server
+    container_name: api-gateway-server
     ports:
       - '3000:3000'
+    volumes:
+      - ./api-gateway-server/logs:/app/logs
     depends_on:
       - mongo
     environment:
-      MONGO_URI: mongodb://mongo:27017/gatewaydb
+      MONGODB_URI: mongodb://mongo:27017/gatewaydb
       AUTH_URL: http://auth-server:3001
       EVENT_URL: http://event-server:3002
+    networks:
+      - app-tier
 
   auth-server:
     build: ./auth-server
+    container_name: auth-server
     ports:
       - '3001:3001'
     depends_on:
       - mongo
     environment:
-      MONGO_URI: mongodb://mongo:27017/authdb
+      MONGODB_URI: mongodb://mongo:27017/authdb
       JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - app-tier
 
   event-server:
     build: ./event-server
+    container_name: event-server
     ports:
       - '3002:3002'
     depends_on:
       - mongo
     environment:
-      MONGO_URI: mongodb://mongo:27017/eventdb
+      MONGODB_URI: mongodb://mongo:27017/eventdb
+    networks:
+      - app-tier
 
   mongo:
     image: mongo
+    container_name: mongo
     ports:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
     tty: true
+    networks:
+      - app-tier
+
+networks:
+  app-tier:
+    driver: bridge
 
 volumes:
   mongo-data: null
