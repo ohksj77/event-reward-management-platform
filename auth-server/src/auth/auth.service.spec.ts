@@ -6,6 +6,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { AUTH_CONSTANTS } from './auth.constants';
+import { UserRole } from '../user/user.schema'
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
@@ -57,10 +58,17 @@ describe('AuthService', () => {
       loginId: 'testuser',
       password: 'password123',
       nickname: 'Test User',
+      role: UserRole.USER
     };
 
     it('should register a new user successfully', async () => {
-      const mockUser = { _id: 'user123', ...registerDto };
+      const mockUser = {
+        _id: 'user123',
+        loginId: 'testuser',
+        password: 'hashedpassword',
+        nickname: 'Test User',
+        role: UserRole.USER
+      };
       mockUserService.create.mockResolvedValue(mockUser);
 
       const result = await service.register(registerDto);
@@ -83,7 +91,13 @@ describe('AuthService', () => {
     };
 
     it('should login successfully and return tokens', async () => {
-      const mockUser = { _id: 'user123', ...loginDto };
+      const mockUser = {
+        _id: 'user123',
+        loginId: 'testuser',
+        password: 'hashedpassword',
+        nickname: 'Test User',
+        role: UserRole.USER
+      };
       const mockTokens = {
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
@@ -187,7 +201,6 @@ describe('AuthService', () => {
       mockTokenService.verifyToken.mockImplementation(() => {
         throw new Error('Invalid token');
       });
-
       await expect(service.logout({ refreshToken })).rejects.toThrow(UnauthorizedException);
     });
   });

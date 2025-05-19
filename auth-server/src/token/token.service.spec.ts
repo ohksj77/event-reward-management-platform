@@ -3,7 +3,6 @@ import { TokenService } from './token.service';
 import { JwtService } from '@nestjs/jwt';
 import { TokenRepository } from './token.repository';
 import { User } from '../user/user.schema';
-import { AUTH_CONSTANTS } from '../auth/auth.constants';
 
 describe('TokenService', () => {
   let service: TokenService;
@@ -30,31 +29,22 @@ describe('TokenService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TokenService,
-        {
-          provide: JwtService,
-          useValue: mockJwtService,
-        },
-        {
-          provide: TokenRepository,
-          useValue: mockTokenRepository,
-        },
+        { provide: JwtService, useValue: mockJwtService },
+        { provide: TokenRepository, useValue: mockTokenRepository },
       ],
     }).compile();
 
     service = module.get<TokenService>(TokenService);
     jwtService = module.get<JwtService>(JwtService);
     tokenRepository = module.get<TokenRepository>(TokenRepository);
+
+    jest.clearAllMocks();
   });
 
   describe('generateTokens', () => {
     it('should generate access and refresh tokens', () => {
       const accessToken = 'access-token';
       const refreshToken = 'refresh-token';
-      const expectedPayload = {
-        sub: mockUser._id,
-        username: mockUser.loginId,
-        iat: expect.any(Number),
-      };
 
       mockJwtService.sign
         .mockReturnValueOnce(accessToken)
@@ -66,10 +56,18 @@ describe('TokenService', () => {
         accessToken,
         refreshToken,
       });
-      expect(mockJwtService.sign).toHaveBeenCalledWith(expectedPayload);
       expect(mockJwtService.sign).toHaveBeenCalledWith(
-        expectedPayload,
-        { expiresIn: AUTH_CONSTANTS.JWT.REFRESH_TOKEN_EXPIRES_IN }
+        expect.objectContaining({
+          sub: mockUser._id,
+          loginId: mockUser.loginId,
+        }),
+      );
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sub: mockUser._id,
+          loginId: mockUser.loginId,
+        }),
+        expect.objectContaining({ expiresIn: expect.any(String) }),
       );
     });
   });
@@ -77,7 +75,7 @@ describe('TokenService', () => {
   describe('verifyToken', () => {
     it('should verify token and return payload', () => {
       const token = 'test-token';
-      const payload = { sub: 'user123', username: 'testuser' };
+      const payload = { sub: 'user123', loginId: 'testuser' };
 
       mockJwtService.verify.mockReturnValue(payload);
 

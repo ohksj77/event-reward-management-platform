@@ -1,4 +1,5 @@
-import { IsString, MinLength } from 'class-validator';
+import { IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
+import { UserRole } from '../user.schema';
 
 export class CreateUserDto {
   @IsString()
@@ -10,4 +11,8 @@ export class CreateUserDto {
 
   @IsString()
   nickname: string;
+
+  @IsEnum(UserRole)
+  @IsOptional()
+  role?: UserRole;
 }

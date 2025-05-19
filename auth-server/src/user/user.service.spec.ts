@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
-import { RegisterDto } from '../auth/dto/register.dto';
-import * as bcrypt from 'bcryptjs';
+import { UserRole } from './user.schema';
+import * as bcrypt from 'bcrypt';
 
-jest.mock('bcryptjs', () => ({
+jest.mock('bcrypt', () => ({
   hash: jest.fn(),
   compare: jest.fn(),
 }));
@@ -35,16 +35,16 @@ describe('UserService', () => {
   });
 
   describe('create', () => {
-    const registerDto: RegisterDto = {
+    const hashedPassword = 'hashedPassword123';
+    const registerDto = {
       loginId: 'testuser',
       password: 'password123',
-      nickname: 'Test User',
+      nickname: 'nickname',
+      role: UserRole.USER
     };
+    const mockUser = { _id: 'user123', ...registerDto, password: hashedPassword };
 
     it('should create a new user with hashed password', async () => {
-      const hashedPassword = 'hashedPassword123';
-      const mockUser = { _id: 'user123', ...registerDto, password: hashedPassword };
-
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
       mockUserRepository.create.mockResolvedValue(mockUser);
 
@@ -111,11 +111,10 @@ describe('UserService', () => {
 
   describe('validatePassword', () => {
     it('should return true for valid password', async () => {
-      const plainPassword = 'password123';
-      const hashedPassword = 'hashedPassword123';
-
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-
+      
+      const plainPassword = 'wrongpassword';
+      const hashedPassword = 'hashedPassword123';
       const result = await service.validatePassword(plainPassword, hashedPassword);
 
       expect(result).toBe(true);
@@ -123,10 +122,9 @@ describe('UserService', () => {
     });
 
     it('should return false for invalid password', async () => {
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
       const plainPassword = 'wrongpassword';
       const hashedPassword = 'hashedPassword123';
-
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const result = await service.validatePassword(plainPassword, hashedPassword);
 
