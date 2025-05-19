@@ -1,10 +1,27 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { EventModule } from './event/event.module';
+import { RewardModule } from './reward/reward.module';
+import { RewardRequestModule } from './reward-request/reward-request.module';
+import { GameLogModule } from './game-log/game-log.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    EventModule,
+    RewardModule,
+    RewardRequestModule,
+    GameLogModule,
+  ],
 })
 export class AppModule {}
