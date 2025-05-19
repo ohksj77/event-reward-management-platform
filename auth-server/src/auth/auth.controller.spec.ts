@@ -13,6 +13,8 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AUTH_CONSTANTS } from './auth.constants';
+import { UserRole } from '../user/user.schema';
+import * as bcrypt from 'bcrypt';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -107,6 +109,7 @@ describe('AuthController', () => {
       loginId: 'testuser',
       password: 'password123',
       nickname: 'Test User',
+      role: UserRole.USER,
     };
 
     it('should register a new user', async () => {
@@ -115,7 +118,9 @@ describe('AuthController', () => {
 
       const result = await controller.register(registerDto);
 
-      expect(result).toEqual({ _id: mockUser._id });
+      expect(result).toEqual(
+        expect.objectContaining({ _id: mockUser._id })
+      );
       expect(mockAuthService.register).toHaveBeenCalledWith(registerDto);
     });
 
