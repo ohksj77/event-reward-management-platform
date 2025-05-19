@@ -8,10 +8,12 @@ services:
       - ./api-gateway-server/logs:/app/logs
     depends_on:
       - mongo
+      - auth-server
+      - event-server
     environment:
-      MONGODB_URI: mongodb://mongo:27017/gatewaydb
       AUTH_URL: http://auth-server:3001
       EVENT_URL: http://event-server:3002
+      JWT_SECRET: ${JWT_SECRET}
     networks:
       - app-tier
 
