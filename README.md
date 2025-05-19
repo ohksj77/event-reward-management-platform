@@ -185,7 +185,7 @@ http://localhost:3001/api-docs
 http://localhost:3002/api-docs
 ```
 
-- API Gateway의 로그는 ./api-gateway-server/log 로컬 디렉토리에 저장됩니다.
+- API Gateway의 요청 로그는 ./api-gateway-server/log 로컬 디렉토리에 마운트되어 저장됩니다.
 
 ## 9. 아쉬운 점 & 보완하고 싶은 점
 1. MongoDB 트랜잭션에 대해 고려하지 못한 점 아쉽습니다.
