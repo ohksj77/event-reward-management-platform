@@ -11,6 +11,7 @@
 6. 멀티 모듈 vs 프로젝트 분리
 7. API Gateway 관련 고민
 8. 실행 방법
+9. 아쉬운 점 & 보완하고 싶은 점
 
 
 ## 1. 이벤트 설계
@@ -65,6 +66,12 @@
     - 실제 요청 결과를 확인할 때는 이 API를 폴링으로 PENDING에서 성공/실패로 바뀔때까지 반복 요청 (최대 반복 횟수 혹은 전체 timeout 설정 필요)
 - [운영자 / 감사자 / 관리자] 전체 유저 요청 기록 조회: [GET] /api/v1/reward-requests?page=0&size=20
 - 필터링 조회: [GET] /api/v1/reward-requests?type=STATUS&target=PENDING
+
+### 테스트의 편의성을 위해 만든 API
+- 게임 로그 생성: [POST] /api/v1/game-logs
+- 게임 로그 목록 조회: [GET] /api/v1/game-logs?page=0&size=20
+- 관리자 회원 가입: [POST] /api/v1/auth/admin/register
+    - 권한을 설정하여 회원 가입 가능
 
 
 ## 3. DB 스키마 명세
@@ -162,3 +169,25 @@
 ```
 docker compose up -d
 ```
+
+- MongoDB 접속 커맨드
+```
+docker compose exec -it mongo mongosh
+```
+
+- API Docs (auth-server)
+```
+http://localhost:3001/api-docs
+```
+
+- API Docs (event-server)
+```
+http://localhost:3002/api-docs
+```
+
+- API Gateway의 로그는 ./api-gateway-server/log 로컬 디렉토리에 저장됩니다.
+
+## 9. 아쉬운 점 & 보완하고 싶은 점
+1. MongoDB 트랜잭션에 대해 고려하지 못한 점 아쉽습니다.
+2. 분산 환경에서의 API Docs를 어떻게 통합 설정할 수 있을지 좋을지 헷갈려 시간을 많이 소요한 점 아쉽습니다.
+3. 테스트 작성 시 Fixture를 도입했다면 시간을 절약할 수 있었을 것이라 느꼈습니다.
